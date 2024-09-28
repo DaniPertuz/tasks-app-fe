@@ -1,13 +1,11 @@
-import { useState } from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import { SwitchTaskStatus } from '../../components/tasks/SwitchTaskStatus';
 import { Task } from '../../../core/entities/task';
+import { useModalComponent } from '../../hooks/useModalComponent';
 import { ModalComponentHeader } from './ModalComponentHeader';
 import { SaveButton } from '../SaveButton';
 import { TextInputComponent } from '../TextInputComponent';
 import { appColors } from '../../../theme/colors';
-import { useTasksStore } from '../../../store/useTaskStore';
-import { TaskStatus } from '../../../interfaces';
 
 interface Props {
   task?: Task;
@@ -16,34 +14,14 @@ interface Props {
 }
 
 export const ModalComponent = ({ task, visible, setVisible }: Props) => {
-  const [taskObj, setTaskObj] = useState<Task>(task || {
-    title: '',
-    body: '',
-    status: TaskStatus.Pending
-  });
-  const addTask = useTasksStore(state => state.addTask);
-  const updateTask = useTasksStore(state => state.updateTask);
-  const handleTitleChange = (title: string) => {
-    setTaskObj(prev => ({ ...prev, title }));
-  };
-  const handleDescriptionChange = (description: string) => {
-    setTaskObj(prev => ({ ...prev, body: description }));
-  };
-  const handleSwitchChange = (isCompleted: boolean) => {
-    console.log({isCompleted})
-    setTaskObj(prev => ({
-      ...prev,
-      status: isCompleted ? TaskStatus.Completed : TaskStatus.Pending
-    }));
-  };
-  const onSubmit = () => {
-    if (task) {
-      updateTask(taskObj);
-    } else {
-      addTask(taskObj);
-    }
-    setVisible(false);
-  };
+  const {
+    taskObj,
+    handleDescriptionChange,
+    handleSwitchChange,
+    handleTitleChange,
+    onSubmit
+  } = useModalComponent({ task, setVisible });
+
   return (
     <Modal animationType="slide" transparent={true} visible={visible}>
       <View style={styles.modalContainer}>
